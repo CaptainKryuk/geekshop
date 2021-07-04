@@ -4,8 +4,9 @@ from django.contrib import auth
 from django.urls import reverse
 from authapp.models import User
 from django.contrib import messages
+from django.db import transaction
 
-from authapp.forms import UserLoginForm, UserRegisterForm, UserEditForm
+from authapp.forms import UserLoginForm, UserRegisterForm, UserEditForm, UserProfileEditForm
 
 
 def login(request):
@@ -22,7 +23,7 @@ def login(request):
         if user.activated:
             auth.authenticate()
             if user and user.is_active:
-                auth.login(request, user)
+                auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 if 'next' in request.POST.keys():
                     return HttpResponseRedirect(request.POST['next'])
                 else:
@@ -61,19 +62,30 @@ def register(request):
     return render(request, 'authapp/register.html', context)
 
 
+@transaction.atomic
 def edit(request):
     title = 'редактирование'
-
+    
     if request.method == 'POST':
-        edit_form = UserEditForm(request.POST, request.FILES, instance=request.user)
-        if edit_form.is_valid():
+        edit_form = UserEditForm(request.POST, request.FILES, \
+                                     instance=request.user)
+        profile_form = UserProfileEditForm(request.POST, \
+                                     instance=request.user.userprofile)
+        if edit_form.is_valid() and profile_form.is_valid():
             edit_form.save()
             return HttpResponseRedirect(reverse('auth:edit'))
     else:
         edit_form = UserEditForm(instance=request.user)
-
-    content = {'title': title, 'edit_form': edit_form}
-
+        profile_form = UserProfileEditForm(
+            instance=request.user.userprofile
+        )
+    
+    content = {
+        'title': title, 
+        'edit_form': edit_form, 
+        'profile_form': profile_form
+    }
+    
     return render(request, 'authapp/edit.html', content)
 
 
@@ -86,4 +98,3 @@ def activate(request, pk):
         user.save()
         return render(request, 'authapp/success_activate.html')
     return render(request, 'authapp/key_expired.html')
-    

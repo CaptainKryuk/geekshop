@@ -1,8 +1,8 @@
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 
-from adminapp.forms import ShopUserRegisterForm, ProductEditForm, ProductCategoryEditForm
-from authapp.models import ShopUser
+from adminapp.forms import UserRegisterForm, ProductEditForm, ProductCategoryEditForm
+from authapp.models import User
 from django.shortcuts import get_object_or_404, render
 from mainapp.models import Product, ProductCategory
 from django.contrib.auth.decorators import user_passes_test
@@ -12,19 +12,19 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class UserListView(LoginRequiredMixin, ListView):
-    model = ShopUser
+    model = User
     template_name = 'adminapp/users.html'
     context_object_name = 'objects'
 
     def get_queryset(self):
-        return ShopUser.objects.filter(is_delete=False)
+        return User.objects.filter(is_delete=False)
 
 
 # @user_passes_test(lambda u: u.is_superuser)
 # def users(request):
 #     title = 'админка/пользователи'
 #
-#     users_list = ShopUser.objects.filter(is_delete=False).order_by('-is_active', '-is_superuser', '-is_staff', 'username')
+#     users_list = User.objects.filter(is_delete=False).order_by('-is_active', '-is_superuser', '-is_staff', 'username')
 #
 #     context = {
 #         'title': title,
@@ -35,9 +35,9 @@ class UserListView(LoginRequiredMixin, ListView):
 
 
 class UserCreateView(CreateView):
-    model = ShopUser
-    form_class = ShopUserRegisterForm
-    template_name = 'adminapp/shopuser_form.html'
+    model = User
+    form_class = UserRegisterForm
+    template_name = 'adminapp/User_form.html'
     success_url = reverse_lazy('admin_staff:users')
 
 # @user_passes_test(lambda u: u.is_superuser)
@@ -45,13 +45,13 @@ class UserCreateView(CreateView):
 #     title = 'пользователи/создание'
 #
 #     if request.method == 'POST':
-#         user_form = ShopUserRegisterForm(request.POST, request.FILES)
+#         user_form = UserRegisterForm(request.POST, request.FILES)
 #         if user_form.is_valid():
 #             user_form.save()
 #
 #             return HttpResponseRedirect(reverse('admin_staff:users'))
 #     else:
-#         user_form = ShopUserRegisterForm()
+#         user_form = UserRegisterForm()
 #
 #     context = {
 #         'title': title,
@@ -65,16 +65,16 @@ class UserCreateView(CreateView):
 def user_update(request, pk):
     title = 'пользователи/рудактирование'
 
-    edit_user = get_object_or_404(ShopUser, pk=pk)
+    edit_user = get_object_or_404(User, pk=pk)
 
     if request.method == 'POST':
-        edit_form = ShopUserRegisterForm(request.POST, request.FILES, instance=edit_user)
+        edit_form = UserRegisterForm(request.POST, request.FILES, instance=edit_user)
         if edit_form.is_valid():
             edit_form.save()
 
             return HttpResponseRedirect(reverse('admin_staff:user_update', args=[edit_user.pk]))
     else:
-        edit_form = ShopUserRegisterForm(instance=edit_user)
+        edit_form = UserRegisterForm(instance=edit_user)
 
     context = {
         'title': title,
@@ -87,7 +87,7 @@ def user_update(request, pk):
 def user_delete(request, pk):
     title = 'пользователи/удаление'
 
-    user = get_object_or_404(ShopUser, pk=pk)
+    user = get_object_or_404(User, pk=pk)
 
     if request.method == 'POST':
         user.is_delete = True

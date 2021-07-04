@@ -1,22 +1,22 @@
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
 from django import forms
-from .models import ShopUser
+from .models import User
 
 
-class ShopUserLoginForm(AuthenticationForm):
+class UserLoginForm(AuthenticationForm):
     class Meta:
-        model = ShopUser
+        model = User
         fields = ('username', 'password')
 
     def __init__(self, *args, **kwargs):
-        super(ShopUserLoginForm, self).__init__(*args, **kwargs)
+        super(UserLoginForm, self).__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
 
 
-class ShopUserRegisterForm(UserCreationForm):
+class UserRegisterForm(UserCreationForm):
     class Meta:
-        model = ShopUser
+        model = User
         fields = ('username', 'first_name', 'password1', 'password2', 'email', 'age', 'avatar')
 
     def __init__(self, *args, **kwargs):
@@ -33,9 +33,9 @@ class ShopUserRegisterForm(UserCreationForm):
         return data
 
 
-class ShopUserEditForm(UserChangeForm):
+class UserEditForm(UserChangeForm):
     class Meta:
-        model = ShopUser
+        model = User
         fields = ('username', 'first_name', 'email', 'age', 'avatar', 'password')
 
     def __init__(self, *args, **kwargs):

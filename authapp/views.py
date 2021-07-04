@@ -1,14 +1,17 @@
-from django.shortcuts import render, HttpResponseRedirect
+import re
+from django.shortcuts import render, HttpResponseRedirect, redirect
 from django.contrib import auth
 from django.urls import reverse
+from authapp.models import User
+from django.contrib import messages
 
-from authapp.forms import ShopUserLoginForm, ShopUserRegisterForm, ShopUserEditForm
+from authapp.forms import UserLoginForm, UserRegisterForm, UserEditForm
 
 
 def login(request):
     title = 'входа'
 
-    login_form = ShopUserLoginForm(data=request.POST)
+    login_form = UserLoginForm(data=request.POST)
     next = request.GET['next'] if 'next' in request.GET.keys() else ''
 
     if request.method == 'POST' and login_form.is_valid():
@@ -16,13 +19,15 @@ def login(request):
         passsword = request.POST['password']
 
         user = auth.authenticate(username=username, password=passsword)
-        auth.authenticate()
-        if user and user.is_active:
-            auth.login(request, user)
-            if 'next' in request.POST.keys():
-                return HttpResponseRedirect(request.POST['next'])
-            else:
-                return HttpResponseRedirect(reverse('index'))
+        if user.activated:
+            auth.authenticate()
+            if user and user.is_active:
+                auth.login(request, user)
+                if 'next' in request.POST.keys():
+                    return HttpResponseRedirect(request.POST['next'])
+                else:
+                    return HttpResponseRedirect(reverse('index'))
+        messages.error(request, 'Аккаунт не активирован')
 
     context = {
         'title': title,
@@ -42,13 +47,14 @@ def register(request):
     title = 'регистрация'
 
     if request.method == 'POST':
-        register_form = ShopUserRegisterForm(request.POST, request.FILES)
+        register_form = UserRegisterForm(request.POST, request.FILES)
 
         if register_form.is_valid():
             register_form.save()
+            messages.success(request, "E-mail с подтверждением отправлен на Вашу элетронную почту")
             return HttpResponseRedirect(reverse('auth:login'))
     else:
-        register_form = ShopUserRegisterForm()
+        register_form = UserRegisterForm()
 
     context = {'title': title, 'register_form': register_form}
 
@@ -59,13 +65,25 @@ def edit(request):
     title = 'редактирование'
 
     if request.method == 'POST':
-        edit_form = ShopUserEditForm(request.POST, request.FILES, instance=request.user)
+        edit_form = UserEditForm(request.POST, request.FILES, instance=request.user)
         if edit_form.is_valid():
             edit_form.save()
             return HttpResponseRedirect(reverse('auth:edit'))
     else:
-        edit_form = ShopUserEditForm(instance=request.user)
+        edit_form = UserEditForm(instance=request.user)
 
     content = {'title': title, 'edit_form': edit_form}
 
     return render(request, 'authapp/edit.html', content)
+
+
+def activate(request, pk):
+    user = User.objects.filter(activation_key=pk).first()
+    if not user:
+        return redirect('/404')
+    if not user.is_activation_key_expired():
+        user.activated = True
+        user.save()
+        return render(request, 'authapp/success_activate.html')
+    return render(request, 'authapp/key_expired.html')
+    

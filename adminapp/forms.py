@@ -1,12 +1,12 @@
 from django import forms
-from authapp.models import ShopUser
-from authapp.forms import ShopUserEditForm
+from authapp.models import User
+from authapp.forms import UserEditForm
 from mainapp.models import Product, ProductCategory
 
 
-class ShopUserRegisterForm(ShopUserEditForm):
+class UserRegisterForm(UserEditForm):
     class Meta:
-        model = ShopUser
+        model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'age', 'avatar', 'is_active', 'is_staff', 'is_delete')
 
     def __init__(self, *args, **kwargs):
@@ -19,7 +19,7 @@ class ShopUserRegisterForm(ShopUserEditForm):
                 field.help_text = ''
 
 
-class ProductEditForm(ShopUserEditForm):
+class ProductEditForm(UserEditForm):
     class Meta:
         model = Product
         fields = '__all__'

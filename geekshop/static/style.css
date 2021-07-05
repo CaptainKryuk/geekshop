@@ -1056,3 +1056,21 @@ td:first-child {
 	display: block;
 }
 
+.menu .dropdown-toggle {
+	background: none;
+	border: none;
+	color: #8c8c8c;
+	padding: 0 13px 10px;
+	font-weight: bold;
+	outline: none;
+}
+
+.menu .dropdown-toggle.show {
+	border: none;
+	box-shadow: none;
+}
+
+.menu .dropdown-item, .menu .dropdown-item:hover {
+	border: none;
+	background: none;
+}

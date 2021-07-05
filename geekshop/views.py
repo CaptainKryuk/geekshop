@@ -23,3 +23,7 @@ def index(request):
 
 def contacts(request):
     return render(request, 'geekshop/contact.html')
+
+
+def test(request):
+    return render(request, 'geekshop/test.html')

@@ -20,45 +20,11 @@ class UserListView(LoginRequiredMixin, ListView):
         return User.objects.filter(is_delete=False)
 
 
-# @user_passes_test(lambda u: u.is_superuser)
-# def users(request):
-#     title = 'админка/пользователи'
-#
-#     users_list = User.objects.filter(is_delete=False).order_by('-is_active', '-is_superuser', '-is_staff', 'username')
-#
-#     context = {
-#         'title': title,
-#         'objects': users_list
-#     }
-#
-#     return render(request, 'adminapp/users.html', context)
-
-
 class UserCreateView(CreateView):
     model = User
     form_class = UserRegisterForm
     template_name = 'adminapp/User_form.html'
     success_url = reverse_lazy('admin_staff:users')
-
-# @user_passes_test(lambda u: u.is_superuser)
-# def user_create(request):
-#     title = 'пользователи/создание'
-#
-#     if request.method == 'POST':
-#         user_form = UserRegisterForm(request.POST, request.FILES)
-#         if user_form.is_valid():
-#             user_form.save()
-#
-#             return HttpResponseRedirect(reverse('admin_staff:users'))
-#     else:
-#         user_form = UserRegisterForm()
-#
-#     context = {
-#         'title': title,
-#         'update_form': user_form,
-#     }
-#
-#     return render(request, 'adminapp/user_update.html', context)
 
 
 @user_passes_test(lambda u: u.is_superuser)

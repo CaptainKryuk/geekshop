@@ -41,3 +41,7 @@ class Basket(models.Model):
         _items = Basket.objects.filter(user=self.user)
         _total_cost = sum([x.product_cost for x in _items])
         return _total_cost
+
+    @staticmethod
+    def get_items(user):
+        return Basket.objects.filter(user=user)

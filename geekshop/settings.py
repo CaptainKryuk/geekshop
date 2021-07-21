@@ -189,3 +189,10 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
 )
+
+# Database
+# DATABASES = {
+#     "default": env.db("DATABASE_URL")
+# }
+# DATABASES["default"]["ATOMIC_REQUESTS"] = True
+# DATABASE_URL=psql://survey:Admin123@127.0.0.1:5432/new_survey_db

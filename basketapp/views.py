@@ -59,7 +59,6 @@ def basket_edit(request, pk, quantity):
             new_basket_item.delete()
 
         basket_items = Basket.objects.filter(user=request.user).order_by('product__category')
-        print(basket_items, len(basket_items))
 
         context = {
             'basket': basket_items,

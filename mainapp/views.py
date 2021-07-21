@@ -28,7 +28,6 @@ def get_same_products(hot_product):
 
 
 def products(request, pk=None, page=1):
-    print(pk)
     title = 'продукты'
     category = ''
     products = ''

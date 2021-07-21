@@ -26,6 +26,14 @@ class Basket(models.Model):
         auto_now_add=True
     )
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.product.quantity -= self.quantity - self.__class__.get_item(self.pk).quantity
+        else:
+            self.product.quantity -= self.quantity
+        self.product.save()
+        super().save(*args, **kwargs)
+
     @property
     def product_cost(self):
         return self.product.price * self.quantity
@@ -45,3 +53,12 @@ class Basket(models.Model):
     @staticmethod
     def get_items(user):
         return Basket.objects.filter(user=user)
+
+    def delete(self):
+        self.product.quantity += self.quantity
+        self.product.save()
+        super(self.__class__, self).delete()
+
+    @staticmethod
+    def get_item(pk):
+        return Basket.objects.get(id=pk)
